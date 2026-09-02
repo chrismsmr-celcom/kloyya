@@ -1,181 +1,84 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const supabase = createClient()
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
 
-    if (loading) return;
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          password,
-        }),
-      });
-
-      const text = await res.text();
-
-      let data: {
-        error?: string;
-        success?: boolean;
-      } = {};
-
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = {};
-      }
-
-      if (!res.ok) {
-        setError(
-          data.error ||
-            `Erreur serveur (${res.status}).`
-        );
-        return;
-      }
-
-      router.push("/login");
-      router.refresh();
-    } catch (error) {
-      console.error("[REGISTER_CLIENT_ERROR]", error);
-
-      setError(
-        "Impossible de contacter le serveur."
-      );
-    } finally {
-      setLoading(false);
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else if (data.user) {
+      // Optionnel : Créer ici l'entrée Prisma User si tu veux lier les données
+      // await fetch('/api/create-user-profile', { method: 'POST', body: JSON.stringify({ id: data.user.id, email }) })
+      
+      router.push('/login?message=Vérifiez votre email pour confirmer votre compte.')
     }
   }
 
   return (
-    <div className="mx-auto max-w-sm pt-12">
-      <Card className="p-8">
-        <h1 className="text-center font-serif text-2xl italic text-ink">
-          Créer un compte
-        </h1>
+    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-6 rounded-lg border p-6 shadow-sm">
+        <h1 className="text-2xl font-bold text-center">Créer un compte Kloyya</h1>
+        
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-        <form
-          onSubmit={onSubmit}
-          className="mt-6 space-y-4"
-        >
+        <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label
-              htmlFor="name"
-              className="mb-1 block text-sm font-medium text-ink-soft"
-            >
-              Nom
-            </label>
-
-            <Input
-              id="name"
-              name="name"
-              autoComplete="name"
-              required
-              value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-1 block text-sm font-medium text-ink-soft"
-            >
-              Email
-            </label>
-
-            <Input
-              id="email"
-              name="email"
+            <label className="block text-sm font-medium">Email</label>
+            <input
               type="email"
-              autoComplete="email"
               required
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 w-full rounded-md border p-2"
             />
           </div>
-
           <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-ink-soft"
-            >
-              Mot de passe
-            </label>
-
-            <Input
-              id="password"
-              name="password"
+            <label className="block text-sm font-medium">Mot de passe</label>
+            <input
               type="password"
-              autoComplete="new-password"
-              minLength={8}
               required
+              minLength={6}
               value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full rounded-md border p-2"
             />
           </div>
-
-          {error && (
-            <p
-              role="alert"
-              className="text-sm text-signal-warn"
-            >
-              {error}
-            </p>
-          )}
-
-          <Button
+          <button
             type="submit"
-            className="w-full"
             disabled={loading}
+            className="w-full rounded-md bg-blue-600 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading
-              ? "Création..."
-              : "S'inscrire"}
-          </Button>
+            {loading ? 'Inscription...' : "S'inscrire"}
+          </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-ink-muted">
-          Déjà inscrit ?{" "}
-          <Link
-            href="/login"
-            className="text-accent hover:underline"
-          >
-            Se connecter
-          </Link>
+        <p className="text-center text-sm text-gray-600">
+          Déjà un compte ?{' '}
+          <a href="/login" className="text-blue-600 hover:underline">Se connecter</a>
         </p>
-      </Card>
+      </div>
     </div>
-  );
+  )
 }
