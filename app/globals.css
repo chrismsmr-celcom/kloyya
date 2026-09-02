@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  color-scheme: light;
+}
+
+* {
+  border-color: theme("colors.paper.border");
+}
+
+::selection {
+  background: theme("colors.accent.soft");
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid theme("colors.accent.DEFAULT");
+  outline-offset: 2px;
+}
+
+/* Scrollbar minimaliste */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: theme("colors.paper.border");
+  border-radius: 3px;
+}
