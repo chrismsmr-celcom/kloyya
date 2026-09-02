@@ -14,7 +14,8 @@ const links = [
 ];
 
 export function Navbar() {
-  const { data: session } = useSession();
+  const sessionResult = useSession();
+  const session = sessionResult?.data ?? null;
   const pathname = usePathname();
 
   return (
@@ -24,22 +25,25 @@ export function Navbar() {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-ink text-sm font-bold text-white">
             K
           </span>
-          <span className="font-serif text-lg italic text-ink">Kloyya</span>
+
+          <span className="font-serif text-lg italic text-ink">
+            Kloyya
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {links.map((l) => (
+          {links.map((link) => (
             <Link
-              key={l.href}
-              href={l.href}
+              key={link.href}
+              href={link.href}
               className={clsx(
                 "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                pathname === l.href
+                pathname === link.href
                   ? "bg-paper-sunken text-ink"
                   : "text-ink-muted hover:bg-paper-sunken hover:text-ink"
               )}
             >
-              {l.label}
+              {link.label}
             </Link>
           ))}
         </nav>
@@ -50,13 +54,24 @@ export function Navbar() {
               <span className="hidden text-sm text-ink-muted sm:inline">
                 {session.user.name || session.user.email}
               </span>
-              <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: "/login" })}>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  signOut({
+                    callbackUrl: "/login",
+                  })
+                }
+              >
                 Déconnexion
               </Button>
             </>
           ) : (
             <Link href="/login">
-              <Button size="sm">Connexion</Button>
+              <Button size="sm">
+                Connexion
+              </Button>
             </Link>
           )}
         </div>
