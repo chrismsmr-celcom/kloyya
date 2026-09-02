@@ -166,10 +166,10 @@ export async function executeOutcome(outcomeId: string) {
 
         try {
           const result = await executeToolCall({
-            userId: outcome.userId,
-            toolName: use.name,
-            toolinput: toJsonValue(use.input),
-          });
+  userId: outcome.userId,
+  toolName: use.name,
+  toolInput: use.input,
+});
 
           const output =
             result?.data ?? {
