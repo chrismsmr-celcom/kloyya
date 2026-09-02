@@ -153,7 +153,7 @@ export async function executeOutcome(outcomeId: string) {
             toolkitSlug:
               extractToolkitSlug(use.name),
             action: use.name,
-            input: use.input,
+            input: toJsonValue(use.input),
             status: "running",
             startedAt: new Date(),
           },
@@ -168,7 +168,7 @@ export async function executeOutcome(outcomeId: string) {
           const result = await executeToolCall({
             userId: outcome.userId,
             toolName: use.name,
-            toolInput: use.input,
+            toolinput: toJsonValue(use.input),
           });
 
           const output =
@@ -354,7 +354,9 @@ function getErrorMessage(error: unknown) {
 
   return String(error);
 }
-
+function toJsonValue(value: unknown): any {
+  return JSON.parse(JSON.stringify(value));
+}
 async function runDemo(
   outcomeId: string,
   plan: OutcomePlan | null
