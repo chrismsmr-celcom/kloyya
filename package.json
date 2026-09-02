@@ -1,42 +1,42 @@
 {
-"name": "kloyya",
-"version": "0.1.0",
-"private": true,
-"scripts": {
-"dev": "next dev",
-"build": "prisma generate && next build",
-"start": "next start",
-"lint": "next lint",
-"db": "prisma db push",
-"db": "prisma studio",
-"db": "prisma generate"
-},
-"dependencies": {
-"@anthropic-ai/sdk": "^0.32.1",
-"@prisma/client": "^5.20.0",
-"@supabase/ssr": "^0.5.1",
-"@supabase/supabase-js": "^2.45.0",
-"bcryptjs": "^2.4.3",
-"clsx": "^2.1.1",
-"composio-core": "^0.5.13",
-"motion": "^12.23.12",
-"next": "14.2.15",
-"next-auth": "^4.24.8",
-"openai": "^4.72.0",
-"react": "^18.3.1",
-"react-dom": "^18.3.1",
-"stripe": "^16.12.0",
-"zod": "^3.23.8"
-},
-"devDependencies": {
-"@types/bcryptjs": "^2.4.6",
-"@types/node": "^20.16.10",
-"@types/react": "^18.3.10",
-"@types/react-dom": "^18.3.0",
-"autoprefixer": "^10.4.20",
-"postcss": "^8.4.47",
-"prisma": "^5.20.0",
-"tailwindcss": "^3.4.13",
-"typescript": "^5.6.2"
-}
+  "name": "kloyya",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && prisma db push && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@prisma/client": "^5.20.0",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "composio-core": "^0.5.13",
+    "motion": "^12.23.12",
+    "next": "14.2.15",
+    "next-auth": "^4.24.8",
+    "openai": "^4.72.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stripe": "^16.12.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.16.10",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "prisma": "^5.20.0",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.2"
+  }
 }
