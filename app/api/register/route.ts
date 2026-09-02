@@ -11,21 +11,46 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
+
   const parsed = schema.safeParse(body);
+
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "Requete invalide" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error:
+          parsed.error.errors[0]?.message ?? "Requete invalide",
+      },
+      { status: 400 }
+    );
   }
 
   const email = parsed.data.email.toLowerCase();
-  const existing = await db.user.findUnique({ where: { email } });
+
+  const existing = await db.user.findUnique({
+    where: { email },
+  });
+
   if (existing) {
-    return NextResponse.json({ error: "Un compte existe deja avec cet email" }, { status: 409 });
+    return NextResponse.json(
+      {
+        error: "Un compte existe deja avec cet email",
+      },
+      { status: 409 }
+    );
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 10);
+
   const user = await db.user.create({
-    data: { name: parsed.data.name, email, passwordHash },
+    data: {
+      name: parsed.data.name,
+      email,
+      passwordHash,
+    },
   });
 
-  return NextResponse.json({ id: user.id, email: user.email });
+  return NextResponse.json({
+    id: user.id,
+    email: user.email,
+  });
 }
