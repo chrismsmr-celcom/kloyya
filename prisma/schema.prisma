@@ -12,6 +12,7 @@ model User {
   email        String        @unique
   name         String?
   image        String?
+  passwordHash String?
   plan         String        @default("free")
   onboardedAt  DateTime?
   createdAt    DateTime      @default(now())
@@ -37,18 +38,18 @@ model Outcome {
 }
 
 model RunStep {
-  id         String    @id @default(cuid())
-  outcomeId  String
-  index      Int
-  label      String
+  id          String    @id @default(cuid())
+  outcomeId   String
+  index       Int
+  label       String
   toolkitSlug String?
-  action     String?
-  input      Json?
-  output     Json?
-  status     String    @default("running")
-  startedAt  DateTime  @default(now())
-  finishedAt DateTime?
-  outcome    Outcome   @relation(fields: [outcomeId], references: [id])
+  action      String?
+  input       Json?
+  output      Json?
+  status      String    @default("running")
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+  outcome     Outcome   @relation(fields: [outcomeId], references: [id])
 }
 
 model Connection {
@@ -57,8 +58,8 @@ model Connection {
   toolkitSlug          String
   status               String   @default("pending")
   composioConnectionId String?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
   user                 User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, toolkitSlug])
@@ -67,10 +68,10 @@ model Connection {
 model MemoryEntry {
   id        String   @id @default(cuid())
   userId    String
-  category  String   // style | preference | pattern | context | feedback
+  category  String
   key       String
   value     String
-  source    String   @default("explicit") // explicit | inferred | feedback
+  source    String   @default("explicit")
   weight    Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
