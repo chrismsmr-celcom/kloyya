@@ -18,27 +18,19 @@ export async function middleware(request: NextRequest) {
         },
         set(name: string, value: string, options: CookieOptions) {
           request.cookies.set({ name, value, ...options })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
+          // On modifie directement l'objet response existant, sans le réassigner
           response.cookies.set({ name, value, ...options })
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({ name, value: '', ...options })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
           response.cookies.set({ name, value: '', ...options })
         },
       },
     }
   )
 
-  // Rafraîchit la session si nécessaire
+  // Cette ligne est cruciale : elle force Supabase à rafraîchir le cookie 
+  // de session si le token est sur le point d'expirer.
   await supabase.auth.getUser()
 
   return response
