@@ -40,6 +40,13 @@ export default function DashboardPage() {
 
   async function fetchOutcomes() {
     const res = await fetch("/api/outcomes");
+    
+    // 🛡️ SÉCURITÉ : Si non autorisé, on redirige immédiatement
+    if (res.status === 401) {
+      router.push("/login");
+      return;
+    }
+
     if (res.ok) {
       const data = await res.json();
       setOutcomes(data.outcomes.slice(0, 5));
@@ -56,6 +63,13 @@ export default function DashboardPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
+    
+    // Petit check de sécurité ici aussi pour le POST
+    if (res.status === 401) {
+      router.push("/login");
+      return;
+    }
+
     const data = await res.json();
     setLoading(false);
     if (data.outcome) router.push(`/outcomes/${data.outcome.id}`);
