@@ -36,6 +36,13 @@ export default function OutcomesPage() {
 
   async function fetchData() {
     const res = await fetch("/api/outcomes");
+    
+    // 🛡️ SÉCURITÉ : Si non autorisé, on redirige immédiatement
+    if (res.status === 401) {
+      router.push("/login");
+      return;
+    }
+
     if (res.ok) {
       const data = await res.json();
       setOutcomes(data.outcomes);
