@@ -38,6 +38,13 @@ export default function ConnectionsPage() {
 
   async function fetchData() {
     const res = await fetch("/api/connections");
+    
+    // 🛡️ SÉCURITÉ : Si non autorisé, on redirige immédiatement
+    if (res.status === 401) {
+      router.push("/login");
+      return;
+    }
+
     if (res.ok) {
       const data = await res.json();
       setItems(data.items);
