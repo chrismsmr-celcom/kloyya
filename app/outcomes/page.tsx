@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingDots } from "@/components/loading-dots";
@@ -17,15 +17,22 @@ type Outcome = {
 };
 
 export default function OutcomesPage() {
-  const { status } = useSession();
   const router = useRouter();
+  const supabase = createClient();
   const [outcomes, setOutcomes] = useState<Outcome[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
-    if (status === "authenticated") fetchData();
-  }, [status]);
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        router.push("/login");
+      } else {
+        setAuthChecking(false);
+        fetchData();
+      }
+    });
+  }, [router, supabase]);
 
   async function fetchData() {
     const res = await fetch("/api/outcomes");
@@ -44,7 +51,7 @@ export default function OutcomesPage() {
     awaiting_approval: "warning",
   };
 
-  if (loading) {
+  if (authChecking || loading) {
     return (
       <div className="flex h-64 items-center justify-center text-ink-muted">
         Chargement<LoadingDots />
