@@ -1,37 +1,54 @@
 "use client";
 
-import { createBrowserClient } from "@supabase/ssr";
-import { SessionProvider } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-const Ctx = createContext<ReturnType<typeof createBrowserClient> | null>(null);
+const SupabaseContext = createContext<
+  ReturnType<typeof createClient> | null
+>(null);
 
-export const useSupabase = () => useContext(Ctx)!;
+export function useSupabase() {
+  const client = useContext(SupabaseContext);
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() =>
-    createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-  );
+  if (!client) {
+    throw new Error(
+      "useSupabase must be used inside Providers"
+    );
+  }
 
+  return client;
+}
+
+export function Providers({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
 
+  const [supabase] = useState(() => createClient());
+
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
       router.refresh();
     });
 
-    return () => data.subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [router, supabase]);
 
   return (
-    <SessionProvider>
-      <Ctx.Provider value={supabase}>
-        {children}
-      </Ctx.Provider>
-    </SessionProvider>
+    <SupabaseContext.Provider value={supabase}>
+      {children}
+    </SupabaseContext.Provider>
   );
 }
