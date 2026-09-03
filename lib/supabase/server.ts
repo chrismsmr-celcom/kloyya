@@ -18,14 +18,10 @@ export function createClient() {
             cookieStore.set({
               name,
               value,
-              ...(options as Parameters<
-                typeof cookieStore.set
-              >[0] extends infer T
-                ? T
-                : never),
+              ...options,
             });
           } catch {
-            // Les Server Components ne peuvent pas toujours écrire les cookies.
+            // Les Server Components peuvent ne pas autoriser l'écriture des cookies.
           }
         },
 
@@ -34,14 +30,10 @@ export function createClient() {
             cookieStore.set({
               name,
               value: "",
-              ...(options as Parameters<
-                typeof cookieStore.set
-              >[0] extends infer T
-                ? T
-                : never),
+              ...options,
             });
           } catch {
-            // Ignoré côté Server Component.
+            // Les Server Components peuvent ne pas autoriser l'écriture des cookies.
           }
         },
       },
