@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,12 +41,19 @@ const plans = [
 ];
 
 export default function PlansPage() {
-  const { data: session } = useSession();
   const router = useRouter();
+  const supabase = createClient();
   const [loading, setLoading] = useState<string | null>(null);
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAuthed(!!data.user);
+    });
+  }, [supabase]);
 
   async function checkout(plan: string) {
-    if (!session) return router.push("/login");
+    if (!isAuthed) return router.push("/login");
     setLoading(plan);
     const res = await fetch("/api/checkout", {
       method: "POST",
