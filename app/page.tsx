@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,17 +19,24 @@ type Outcome = {
 };
 
 export default function DashboardPage() {
-  const { status } = useSession();
   const router = useRouter();
+  const supabase = createClient();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [outcomes, setOutcomes] = useState<Outcome[]>([]);
   const [fetching, setFetching] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
-    if (status === "authenticated") fetchOutcomes();
-  }, [status]);
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        router.push("/login");
+      } else {
+        setAuthChecking(false);
+        fetchOutcomes();
+      }
+    });
+  }, [router, supabase]);
 
   async function fetchOutcomes() {
     const res = await fetch("/api/outcomes");
@@ -62,7 +69,7 @@ export default function DashboardPage() {
     awaiting_approval: "warning",
   };
 
-  if (status === "loading" || fetching) {
+  if (authChecking || fetching) {
     return (
       <div className="flex h-64 items-center justify-center text-ink-muted">
         Chargement<LoadingDots />
